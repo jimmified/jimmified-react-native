@@ -1,16 +1,17 @@
 import _ from 'lodash';
 import React from 'react';
 import jimmify from '../utils/jimmify';
+import Swiper from 'react-native-swiper';
 import { View, TextInput, Image, Button, Text } from 'react-native';
 import { colors, STATUSBAR_HEIGHT, STORE_KEYS } from '../utils/constants';
 import store from '../utils/store';
 
 const styles = {
     logo: {
-        marginTop: 50,
         width: null,
         resizeMode: 'contain',
-        height: 220,
+        height: 200,
+        marginHorizontal: 10,
         alignSelf: 'stretch'
     },
     input: {
@@ -36,6 +37,37 @@ const styles = {
     }
 };
 
+export class Logo extends React.Component {
+
+    static logos = [
+        'https://jimmified.com/img/logo1.png',
+        'https://jimmified.com/img/logo2.png',
+        'https://jimmified.com/img/logo3.png',
+        'https://jimmified.com/img/logo4.png'
+    ];
+
+    constructor(props) {
+        super(props);
+        this.state = { currentLogo: 1 };
+    }
+
+    render() {
+
+        return (
+        <View style={{ marginTop: 75 }}>
+            <Swiper
+                height={200}
+                showsPagination={false}
+                autoplay={true}
+                autoplayTimeout={10}
+            >
+                {_.map(Logo.logos, uri => <Image key={uri} source={{uri}} style={styles.logo}/>)}
+            </Swiper>
+        </View>);
+
+    }
+}
+
 export default class Login extends React.Component {
 
     constructor(props) {
@@ -60,7 +92,6 @@ export default class Login extends React.Component {
 
     onSubmit() {
         const { navigate } = this.props.navigation;
-
         jimmify.authenticate({
             username: this.state.username,
             password: this.state.password
@@ -80,40 +111,45 @@ export default class Login extends React.Component {
                 });
                 navigate('Main');
             }
+            // navigate('Main');
         }).catch((error) => {
             console.warn('error', error);
         });
     }
 
     render() {
-        return (<View style={styles.wrapper}>
-            <Image
-                source={require('../../assets/images/jimmy-logo.png')}
-                style={styles.logo}
-            />
-            <TextInput
-                onChangeText={this.onUsernameChange}
-                numberOfLines={1}
-                style={[styles.input, styles.placeholder]}
-                placeholder='Username'
-            />
-            <TextInput
-                onChangeText={this.onPasswordChange}
-                numberOfLines={1}
-                secureTextEntry={true}
-                style={[styles.input, styles.placeholder]}
-                placeholder='Password'
-            />
-            {this.state.invalidLogin &&
-                <Text style={styles.validationError}>Invalid username or password.</Text>
-            }
-            <View style={styles.buttonWrapper}>
-                <Button
-                    color={colors.GREEN}
-                    style={styles.button}
-                    onPress={this.onSubmit}
-                    title="SIGN IN"/>
-            </View>
-        </View>)
+        return (
+            <View style={styles.container}>
+                <Logo />
+                <TextInput
+                    autoCorrect={false}
+                    returnKeyType={'next'}
+                    onChangeText={this.onUsernameChange}
+                    numberOfLines={1}
+                    style={[styles.input, styles.placeholder]}
+                    placeholder='Username'
+                    onSubmitEditing={() => { this.passField.focus() }}
+                />
+                <TextInput
+                    returnKeyType={'done'}
+                    autoCorrect={false}
+                    onChangeText={this.onPasswordChange}
+                    numberOfLines={1}
+                    secureTextEntry={true}
+                    style={[styles.input, styles.placeholder]}
+                    placeholder='Password'
+                    ref={(passField) => this.passField = passField}
+                />
+                {this.state.invalidLogin &&
+                    <Text style={styles.validationError}>Invalid username or password.</Text>
+                }
+                <View style={styles.buttonWrapper}>
+                    <Button
+                        color={colors.GREEN}
+                        style={styles.button}
+                        onPress={this.onSubmit}
+                        title="SIGN IN"/>
+                </View>
+            </View>)
     }
 }
