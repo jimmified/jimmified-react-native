@@ -10,6 +10,7 @@ export const colors = {
     YELLOW: '#f4c20d',
     RED: '#db3236',
     BLUE: '#4885ed',
+    GRAY_DARK: '#808080'
 };
 
 export const STORE_KEYS = {

@@ -22,12 +22,10 @@ export default function(requestFunc, Item, options={}) {
         refresh() {
             requestFunc().then((response) => {
                 this.setState({ loading: false });
-                if (response.status === 'true') {
-
+                if (response.status) {
                     if (responseKey) {
                         response = response[responseKey];
                     }
-
                     this.setState({ response });
                 } else {
                     this.setState({ error: errorText });

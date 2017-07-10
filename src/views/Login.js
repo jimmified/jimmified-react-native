@@ -52,7 +52,6 @@ export class Logo extends React.Component {
     }
 
     render() {
-
         return (
         <View style={{ marginTop: 75 }}>
             <Swiper
@@ -97,21 +96,21 @@ export default class Login extends React.Component {
             password: this.state.password
         }).then((response) => {
             // TODO: Why isn't this a boolean!?!
-            if (response.Status === 'false') {
+            if (response.status === false) {
                 this.setState({
                     invalidLogin: true
                 });
             // TODO: And why is this a different case!?!
-            } else if (response.status === 'true') {
+            } else if (response.status === true) {
                 store.save({
                     key: STORE_KEYS.login,
                     data: {
                         token: response.token
                     }
                 });
-                navigate('Main');
+                // navigate('Main');
             }
-            // navigate('Main');
+            navigate('Main');
         }).catch((error) => {
             console.warn('error', error);
         });
