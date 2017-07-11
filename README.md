@@ -16,3 +16,14 @@ To get setup, make sure you have [Expo](https://expo.io/) up and running.
 ```
 
 You can use the [Expo XDE](https://expo.io/tools) to run the project on an Android or iOS emulator.
+
+
+## TODO
+> list of things that still need to be done
+
+- [x] Get the search on the front page working
+- [ ] Add links to the recent requests
+- [ ] Add the flow for answering a question
+- [ ] Make the search page re-use the `Logo` component from `Login`
+- [ ] Hook up firebase
+
