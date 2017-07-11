@@ -1,9 +1,11 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import jimmify from '../utils/jimmify';
-import Logo from './shared/RotatingLogos';
+
+import RotatingLogo from 'shared/RotatingLogos';
 import { View, TextInput, Button, Alert, Platform, Image } from 'react-native';
-import { colors } from '../utils/constants';
+
+import { colors } from 'utils/constants';
+import jimmify from 'utils/jimmify';
 
 const styles = {
     container: {
@@ -69,10 +71,10 @@ export default class Search extends React.Component {
 
     render() {
 
-        const logo = Platform.OS === 'ios' ? <Logo/> : <Image style={styles.logo} source={{uri: 'https://jimmified.com/img/logo1.png' }}/>;
-
-        return (<View>
-            {logo}
+        return (
+					<View style={styles.container}>
+            {/*<Image style={styles.logo} source={{uri: 'https://jimmified.com/img/logo1.png' }}/>*/}
+						<RotatingLogo />
             <TextInput
                 ref={input => this.searchInput = input}
                 style={styles.search}
@@ -85,6 +87,7 @@ export default class Search extends React.Component {
                     <Button title="Search" onPress={this.onSearch} color={colors.GREEN}/>
                 </View>
             </View>
-        </View>);
+        </View>
+			);
     }
 }
