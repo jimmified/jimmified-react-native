@@ -1,4 +1,5 @@
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity, Button, Platform } from 'react-native';
 import {Card, CardTitle} from 'react-native-card-view';
 import RequestList from './shared/RequestList';
@@ -17,7 +18,7 @@ const styles = {
         }
     },
     wrapper: {
-        flex: 1
+        // flex: 1
     },
     modal: {},
     btn: {},
@@ -52,6 +53,13 @@ export const AnswerQueue = RequestList(jimmify.getQueue, QueueItem, {
 
 export default class Answer extends React.Component {
 
+    static navigationOptions = {
+        tabBarLabel: 'Answer',
+        tabBarIcon: ({tintColor}) => {
+            return <Ionicons name="ios-text-outline" size={32} color={tintColor}/>
+        }
+    };
+
     constructor(props) {
         super(props);
 
@@ -76,7 +84,7 @@ export default class Answer extends React.Component {
         }
     }
 
-    componentDidMount() {
+    componentDidUpdate() {
         this.login();
     }
 
@@ -107,9 +115,7 @@ export default class Answer extends React.Component {
                     }}
                 />
             </Modal>
-            {loginText}
-            {!this.state.loggedIn && loginText}
-            {this.state.loggedIn && <AnswerQueue/>}
+            {this.state.loggedIn ? <AnswerQueue/> : loginText}
         </View>);
     }
 }

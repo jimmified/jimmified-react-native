@@ -1,4 +1,5 @@
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import jimmify from '../utils/jimmify';
 import { View, TextInput, Image, Button, Alert } from 'react-native';
 import { colors } from '../utils/constants';
@@ -31,6 +32,13 @@ const styles = {
 };
 
 export default class Search extends React.Component {
+
+    static navigationOptions = {
+        tabBarLabel: 'Search',
+        tabBarIcon: ({ tintColor }) => {
+            return <Ionicons name="ios-search" size={32} color={tintColor} />
+        }
+    };
 
     constructor(props) {
         super(props);

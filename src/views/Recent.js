@@ -1,4 +1,5 @@
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Card, CardTitle, CardContent } from 'react-native-card-view';
 import Autolink from 'react-native-autolink';
 import { colors } from '../utils/constants';
@@ -31,6 +32,15 @@ function RecentItem(props) {
     );
 }
 
-export default RequestList(jimmify.getRecent, RecentItem, {
+const Wrapped =  RequestList(jimmify.getRecent, RecentItem, {
     responseKey: 'recents'
 });
+
+Wrapped.navigationOptions = {
+    tabBarLabel: 'Recent',
+    tabBarIcon: ({tintColor}) => {
+        return <Ionicons name="ios-book-outline" size={32} color={tintColor}/>
+    }
+};
+
+export default Wrapped;

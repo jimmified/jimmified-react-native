@@ -14,11 +14,14 @@ const styles = {
 };
 
 function WithTopPadding(Comp) {
-    return function(props) {
+    const wrapped = function(props) {
         return (<View style={styles.wrapped}>
             <Comp {...props}/>
         </View>)
-    }
+    };
+
+    wrapped.navigationOptions = Comp.navigationOptions;
+    return wrapped;
 }
 
 export default TabNavigator({
