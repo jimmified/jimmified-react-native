@@ -8,9 +8,6 @@ import { colors } from 'utils/constants';
 import jimmify from 'utils/jimmify';
 
 const styles = {
-    container: {
-        flex: 1
-    },
     logo: {
         width: null,
         resizeMode: 'contain',
@@ -72,8 +69,7 @@ export default class Search extends React.Component {
     render() {
 
         return (
-					<View style={styles.container}>
-            {/*<Image style={styles.logo} source={{uri: 'https://jimmified.com/img/logo1.png' }}/>*/}
+					<View>
 						<RotatingLogo />
             <TextInput
                 ref={input => this.searchInput = input}
