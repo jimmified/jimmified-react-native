@@ -35,6 +35,10 @@ class Jimmify {
         return this.request({ route: 'renew', method: 'POST', body });
     }
 
+    search(query) {
+        return this.request({ route: 'query', method: 'POST', body: { type: 'search', text: query }});
+    }
+
     getQueue() {
         return this.request({ route: 'queue', method: 'GET' });
     }

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TextInput, Image, Button } from 'react-native';
+import jimmify from '../utils/jimmify';
+import { View, TextInput, Image, Button, Alert } from 'react-native';
 import { colors } from '../utils/constants';
 
 const styles = {
@@ -36,6 +37,7 @@ export default class Search extends React.Component {
 
         this.onEdit = this.onEdit.bind(this);
         this.onSearch = this.onSearch.bind(this);
+        this.state = { searchText: '' };
     }
 
     onEdit(searchText) {
@@ -43,13 +45,21 @@ export default class Search extends React.Component {
     }
 
     onSearch() {
-
+        jimmify.search(this.state.searchText).then(() => {
+            Alert.alert('Thanks!', 'Thanks for your question. Jimmy will answer it shortly.',[
+                { text: 'OK' }
+            ], { cancelable: true });
+            this.searchInput.clear();
+        }).catch(err => {
+            console.warn(err);
+        })
     }
 
     render() {
         return (<View style={styles.container}>
             <Image style={styles.logo} source={{uri: 'https://jimmified.com/img/logo1.png' }}/>
             <TextInput
+                ref={input => this.searchInput = input}
                 style={styles.search}
                 placeholder='Ask Jimmy'
                 onChangeText={this.onEdit}
