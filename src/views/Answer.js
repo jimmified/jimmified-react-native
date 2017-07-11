@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Button } from 'react-native';
+import { View, Text, TouchableOpacity, Button, Platform } from 'react-native';
 import {Card, CardTitle} from 'react-native-card-view';
 import RequestList from './shared/RequestList';
 import Autolink from "react-native-autolink";
-import { colors, STORE_KEYS } from '../utils/constants';
+import { colors, STORE_KEYS, STATUSBAR_HEIGHT } from '../utils/constants';
 import jimmify from '../utils/jimmify';
 import storage from '../utils/store';
 import Modal from 'react-native-modalbox';
@@ -19,15 +19,16 @@ const styles = {
     wrapper: {
         flex: 1
     },
-    modal: {
-    },
-    btn: {
-    },
+    modal: {},
+    btn: {},
     modalTop: {
+        paddingTop: Platform.OS === 'ios' ? STATUSBAR_HEIGHT : 0,
         flexDirection: 'row',
         justifyContent: 'flex-end'
     },
     buttonWrapper: {
+        height: 40,
+        marginTop: 20,
         marginHorizontal: 20
     }
 };
@@ -75,6 +76,10 @@ export default class Answer extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.login();
+    }
+
     render() {
 
         const loginText = (
@@ -91,9 +96,9 @@ export default class Answer extends React.Component {
 
         return (<View style={styles.wrapper}>
             <Modal ref={login => this.loginModal = login} style={styles.modal} coverScreen={true} swipeToClose={false}>
-                <View style={styles.modelTop}>
+                <View style={styles.modalTop}>
                     <TouchableOpacity onPress={() => { this.loginModal.close() }}>
-                        <Text>✖</Text>
+                        <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
                     </TouchableOpacity>
                 </View>
                 <Login onLogin={() => {
@@ -102,6 +107,7 @@ export default class Answer extends React.Component {
                     }}
                 />
             </Modal>
+            {loginText}
             {!this.state.loggedIn && loginText}
             {this.state.loggedIn && <AnswerQueue/>}
         </View>);

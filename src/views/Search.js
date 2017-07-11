@@ -45,14 +45,16 @@ export default class Search extends React.Component {
     }
 
     onSearch() {
-        jimmify.search(this.state.searchText).then(() => {
-            Alert.alert('Thanks!', 'Thanks for your question. Jimmy will answer it shortly.',[
-                { text: 'OK' }
-            ], { cancelable: true });
-            this.searchInput.clear();
-        }).catch(err => {
-            console.warn(err);
-        })
+        if (this.state.searchText) {
+            jimmify.search(this.state.searchText).then(() => {
+                Alert.alert('Thanks!', 'Thanks for your question. Jimmy will answer it shortly.', [
+                    {text: 'OK'}
+                ], {cancelable: true});
+                this.searchInput.clear();
+            }).catch(err => {
+                console.warn(err);
+            });
+        }
     }
 
     render() {

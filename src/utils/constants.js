@@ -1,9 +1,8 @@
-import { Platform, NativeModules } from 'react-native';
-const { StatusBarManager } = NativeModules;
+import expo from 'expo';
 
 export const JIMMIFY_API_URL = 'https://jimmified.com/api/';
 
-export const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
+export const STATUSBAR_HEIGHT = expo.Constants.statusBarHeight;
 
 export const colors = {
     GREEN: '#3cba54',
