@@ -1,5 +1,6 @@
 import React from 'react';
 import {Text} from 'react-native';
+import Expo from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, CardTitle, CardContent } from 'react-native-card-view';
 import Autolink from 'react-native-autolink';
@@ -23,7 +24,7 @@ const styles = {
 };
 
 function openLink(link) {
-	alert(link)
+	Expo.WebBrowser.openBrowserAsync(link);
 }
 
 function RecentItem(props) {
