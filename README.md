@@ -22,10 +22,8 @@ You can use the [Expo XDE](https://expo.io/tools) to run the project on an Andro
 > list of things that still need to be done
 
 - [x] Get the search on the front page working
-- [ ] Add links to the recent requests
+- [x] Add links to the recent requests
 - [ ] Add the flow for answering a question
 - [x] Make the search page re-use the `Logo` component from `Login`
-  - Doesn't render anything on Android for some reason -- but got it working for iOS
 - [ ] Hook up firebase
 - [ ] Add a `Settings` page w/ option to logout
-
