@@ -1,19 +1,12 @@
 import _ from 'lodash';
 import React from 'react';
 import jimmify from '../utils/jimmify';
-import Swiper from 'react-native-swiper';
-import { View, TextInput, Image, Button, Text } from 'react-native';
+import Logo from './shared/RotatingLogos';
+import { View, TextInput, Button, Text } from 'react-native';
 import { colors, STATUSBAR_HEIGHT, STORE_KEYS } from '../utils/constants';
 import store from '../utils/store';
 
 const styles = {
-    logo: {
-        width: null,
-        resizeMode: 'contain',
-        height: 200,
-        marginHorizontal: 10,
-        alignSelf: 'stretch'
-    },
     input: {
         marginHorizontal: 20,
         marginBottom: 10,
@@ -22,10 +15,6 @@ const styles = {
     },
     placeholder: {
         fontSize: 18
-    },
-    wrapper: {
-        flex: 1,
-        marginTop: STATUSBAR_HEIGHT
     },
     buttonWrapper: {
         marginTop: 20,
@@ -37,37 +26,12 @@ const styles = {
     }
 };
 
-export class Logo extends React.Component {
-
-    static logos = [
-        'https://jimmified.com/img/logo1.png',
-        'https://jimmified.com/img/logo2.png',
-        'https://jimmified.com/img/logo3.png',
-        'https://jimmified.com/img/logo4.png'
-    ];
-
-    constructor(props) {
-        super(props);
-        this.state = { currentLogo: 1 };
-    }
-
-    render() {
-        return (
-        <View style={{ marginTop: 75 }}>
-            <Swiper
-                height={200}
-                showsPagination={false}
-                autoplay={true}
-                autoplayTimeout={10}
-            >
-                {_.map(Logo.logos, uri => <Image key={uri} source={{uri}} style={styles.logo}/>)}
-            </Swiper>
-        </View>);
-
-    }
-}
 
 export default class Login extends React.Component {
+
+    static defaultProps = {
+        onLogin: () => {}
+    };
 
     constructor(props) {
         super(props);
@@ -90,7 +54,6 @@ export default class Login extends React.Component {
     }
 
     onSubmit() {
-        const { navigate } = this.props.navigation;
         jimmify.authenticate({
             username: this.state.username,
             password: this.state.password
@@ -108,9 +71,8 @@ export default class Login extends React.Component {
                         token: response.token
                     }
                 });
-                // navigate('Main');
+                this.props.onLogin(response.token);
             }
-            navigate('Main');
         }).catch((error) => {
             console.warn('error', error);
         });
@@ -118,7 +80,7 @@ export default class Login extends React.Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View>
                 <Logo />
                 <TextInput
                     autoCorrect={false}
@@ -145,7 +107,6 @@ export default class Login extends React.Component {
                 <View style={styles.buttonWrapper}>
                     <Button
                         color={colors.GREEN}
-                        style={styles.button}
                         onPress={this.onSubmit}
                         title="SIGN IN"/>
                 </View>

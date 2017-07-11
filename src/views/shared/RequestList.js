@@ -1,13 +1,25 @@
+import _ from 'lodash';
 import React from 'react';
 import { Text, FlatList } from 'react-native';
 import { colors } from '../../utils/constants';
 
 const defaultErrorMessage = 'Error fetching results, please check your network connection';
 
+const styles = {
+    placeholder: {
+        margin: 20,
+        alignSelf: 'center',
+        textAlign: 'center',
+        color: colors.GRAY_DARK
+    }
+};
+
 export default function(requestFunc, Item, options={}) {
 
     const errorText = options.errorText || defaultErrorMessage;
     const responseKey = options.responseKey;
+    options.placeholder = options.placeholder || 'Nothing here.\nPull down to refresh.';
+    const placeholder = _.isString(options.placeholder) ? <Text style={styles.placeholder}>{options.placeholder}</Text> : options.placeholder;
 
     return class extends React.Component {
 
@@ -37,13 +49,17 @@ export default function(requestFunc, Item, options={}) {
         }
 
         render() {
+            const data = this.state.response || [];
+
             if (this.state.error) {
                 return (<Text style={{ color: colors.RED }}>{this.state.error}</Text>);
             }
 
             return (<FlatList
+                style={{ backgroundColor: colors.GRAY_LIGHT }}
                 data={this.state.response || []}
                 extraData={this.state}
+                ListEmptyComponent={placeholder}
                 renderItem={Item}
                 refreshing={this.state.loading}
                 onRefresh={() => {

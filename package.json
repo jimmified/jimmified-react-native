@@ -12,6 +12,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-18.0.1.tar.gz",
     "react-native-autolink": "^1.0.0",
     "react-native-card-view": "0.0.3",
+    "react-native-modalbox": "^1.4.0",
     "react-native-storage": "^0.2.2",
     "react-native-swiper": "^1.5.4",
     "react-navigation": "^1.0.0-beta.11",
