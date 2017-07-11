@@ -26,4 +26,5 @@ You can use the [Expo XDE](https://expo.io/tools) to run the project on an Andro
 - [ ] Add the flow for answering a question
 - [ ] Make the search page re-use the `Logo` component from `Login`
 - [ ] Hook up firebase
+- [ ] Add a `Settings` page w/ option to logout
 
