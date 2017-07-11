@@ -1,4 +1,5 @@
 import React from 'react';
+import {Text} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, CardTitle, CardContent } from 'react-native-card-view';
 import Autolink from 'react-native-autolink';
@@ -14,9 +15,16 @@ const styles = {
         },
         answer: {
             fontStyle: 'italic'
-        }
+        },
+				link: {
+					color: colors.BLUE
+				}
     }
 };
+
+function openLink(link) {
+	alert(link)
+}
 
 function RecentItem(props) {
     const { item } = props;
@@ -28,6 +36,13 @@ function RecentItem(props) {
             <CardContent>
                 <Autolink style={styles.item.answer} text={item.answer} />
             </CardContent>
+						{
+							item.list
+							? item.list.map((link) => {
+								return (<Text key={link} style={styles.item.link} onPress={openLink.bind(this, link)}>{link}</Text>)
+							})
+							: null
+						}
         </Card>
     );
 }
