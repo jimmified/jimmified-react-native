@@ -81,13 +81,22 @@ export default class Answer extends React.Component {
     }
 
     login() {
-        if (!this.state.loggedIn) {
+        if (!this.state.loggedIn && this.props.isFocused) {
             this.loginModal.open();
         }
     }
 
-    componentDidUpdate() {
-        this.login();
+    componentWillReceiveProps() {
+        storage
+            .load({ key: STORE_KEYS.login })
+            .then(({ token }) => {
+                this.setState({ loggedIn: true, token });
+            }).catch(error => {
+            if (error.name === 'NotFoundError' || error.name === 'ExpiredError') {
+                this.setState({ loggedIn: false });
+                this.login();
+            }
+        });
     }
 
     onAnswer(answer) {

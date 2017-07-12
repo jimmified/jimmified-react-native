@@ -1,17 +1,22 @@
 import _ from 'lodash';
 import React from 'react';
-import { STORE_KEYS, colors } from 'utils/constants';
+import { STORE_KEYS, colors, STATUSBAR_HEIGHT } from 'utils/constants';
 import storage from 'utils/store';
 import { Ionicons } from '@expo/vector-icons';
-import { View, FlatList, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, Text, TouchableOpacity, Platform } from 'react-native';
 import IconButton from 'shared/IconButton'
+import Modal from 'react-native-modalbox';
+import Login from './Login';
 
 const SETTINGS = [
     {
         name: 'Log in',
         icon: 'ios-log-in-outline',
         type: 'button',
-        enabled: (props, state) => !state.loggedIn
+        enabled: (props, state) => !state.loggedIn,
+        onSelect: (foo) => {
+            foo.loginModal.open();
+        }
     },
     {
         name: 'Log out',
@@ -45,7 +50,13 @@ const styles = {
         },
         icon: {
         }
-    }
+    },
+    modal: {},
+    modalTop: {
+        paddingTop: Platform.OS === 'ios' ? STATUSBAR_HEIGHT : 0,
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
+    },
 };
 
 export default class Settings extends React.Component {
@@ -92,12 +103,10 @@ export default class Settings extends React.Component {
         }
 
         if (item.type === 'button') {
-
             const func = item.onSelect || _.noop;
 
             const callback = () => {
-                console.log('calling');
-                const newState = func();
+                const newState = func(this);
                 if (_.isObject(newState)) {
                     this.setState(newState);
                 }
@@ -115,14 +124,41 @@ export default class Settings extends React.Component {
         }
     }
 
+    componentWillReceiveProps() {
+        storage
+            .load({ key: STORE_KEYS.login })
+            .then(() => {
+                this.setState({ loggedIn: true });
+            }).catch(error => {
+            if (error.name === 'NotFoundError' || error.name === 'ExpiredError') {
+                this.setState({ loggedIn: false });
+            }
+        });
+    }
+
     render() {
         return (
+            <View>
+                {!this.state.loggedIn && <Modal ref={login => this.loginModal = login} style={styles.modal} coverScreen={true} swipeToClose={false}>
+                    <View style={styles.modalTop}>
+                        <TouchableOpacity onPress={() => { this.loginModal.close() }}>
+                            <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Login onLogin={(token) => {
+                        this.setState({ loggedIn: true, token });
+                        this.loginModal.close();
+                    }}
+                    />
+                </Modal>}
                 <FlatList
                     style={{ backgroundColor: colors.GRAY_LIGHT }}
                     data={SETTINGS}
+                    extraData={this.props}
                     renderItem={this.renderItem}
                     keyExtractor={this._keyExtractor}
                 />
+            </View>
         )
     }
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Platform } from 'react-native';
 import { TabNavigator } from 'react-navigation';
-import { STATUSBAR_HEIGHT } from '../utils/constants';
+import { STATUSBAR_HEIGHT, events } from '../utils/constants';
+import pubsub from 'utils/pubsub';
 
 import Queue from './Answer';
 import Recent from './Recent';
@@ -14,6 +15,46 @@ const styles = {
     }
 };
 
+function withNavigationIsFocused(WrappedContainer) {
+
+    return class extends React.Component {
+        static navigationOptions = {
+            ...WrappedContainer.navigationOptions
+        };
+
+        constructor(props) {
+            super(props);
+            this.route = WrappedContainer.navigationOptions.tabBarLabel;
+            this.onStateChange = this.onStateChange.bind(this);
+            const currentRoute = props.navigation.state.routeName;
+            this.state = {
+                isFocused: currentRoute === this.route,
+            }
+        }
+
+        onStateChange({ prevState, currentState }) {
+            if (prevState !== currentState) {
+                const isFocused = this.route === currentState;
+                if (this.state.isFocused !== isFocused) {
+                    this.setState({ isFocused });
+                }
+            }
+        }
+
+        componentDidMount() {
+            pubsub.subscribe(events.NAV, this.onStateChange);
+        }
+
+        componentWillUnmount() {
+            pubsub.unsubscribe(events.NAV, this.onStateChange);
+        }
+
+        render() {
+            return <WrappedContainer isFocused={this.state.isFocused} {...this.props} />;
+        }
+    }
+}
+
 function WithTopPadding(Comp) {
     const wrapped = function(props) {
         return (<View style={styles.wrapped}>
@@ -22,10 +63,10 @@ function WithTopPadding(Comp) {
     };
 
     wrapped.navigationOptions = Comp.navigationOptions;
-    return wrapped;
+    return withNavigationIsFocused(wrapped);
 }
 
-export default TabNavigator({
+const Navigator = TabNavigator({
     Answer: { screen: WithTopPadding(Queue) },
     Search: { screen: WithTopPadding(Search) },
     Recent: { screen: WithTopPadding(Recent) },
@@ -42,3 +83,26 @@ export default TabNavigator({
         backBehavior: 'none'
     }
 });
+
+function getCurrentRouteName(navigationState) {
+    if (!navigationState) {
+        return null;
+    }
+    const route = navigationState.routes[navigationState.index];
+    // dive into nested navigators
+    if (route.routes) {
+        return getCurrentRouteName(route);
+    }
+    return route.routeName;
+}
+
+export default class Main extends React.Component {
+
+    render() {
+        return <Navigator
+            onNavigationStateChange={(prevState, currentState) => {
+                pubsub.publish(events.NAV, {prevState: getCurrentRouteName(prevState), currentState: getCurrentRouteName(currentState)});
+            }}
+        />
+    }
+}

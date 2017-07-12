@@ -4,6 +4,10 @@ export const JIMMIFY_API_URL = 'https://jimmified.com/api/';
 
 export const STATUSBAR_HEIGHT = expo.Constants.statusBarHeight;
 
+export const events = {
+    NAV: 'navigate'
+};
+
 export const JIMMYFY_LOGO_URL = [
 		'https://jimmified.com/img/logo1.png',
 		'https://jimmified.com/img/logo2.png',
