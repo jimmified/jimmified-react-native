@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { Text, FlatList } from 'react-native';
+import { Text, FlatList, TouchableOpacity } from 'react-native';
 import { colors } from '../../utils/constants';
 
 const defaultErrorMessage = 'Error fetching results, please check your network connection';
@@ -23,15 +23,28 @@ export default function(requestFunc, Item, options={}) {
 
     return class extends React.Component {
 
+        static defaultProps = {
+            onSelectItem: () => {}
+        };
+
         constructor(props) {
             super(props);
 
+            this.renderItem = this.renderItem.bind(this);
             this.refresh = this.refresh.bind(this);
+            this._refresh = this._refresh.bind(this);
             this.state = { loading: true };
-            this.refresh();
+            this._refresh();
         }
 
         refresh() {
+            this.setState({
+                loading: true
+            });
+            this._refresh();
+        }
+
+        _refresh() {
             requestFunc().then((response) => {
                 this.setState({ loading: false });
                 if (response.status) {
@@ -48,6 +61,14 @@ export default function(requestFunc, Item, options={}) {
             });
         }
 
+        renderItem(props) {
+            return (
+                <TouchableOpacity onPress={_.partial(this.props.onSelectItem, props)}>
+                    <Item {...props} />
+                </TouchableOpacity>
+            );
+        }
+
         render() {
             const data = this.state.response || [];
 
@@ -60,12 +81,9 @@ export default function(requestFunc, Item, options={}) {
                 data={this.state.response || []}
                 extraData={this.state}
                 ListEmptyComponent={placeholder}
-                renderItem={Item}
+                renderItem={this.renderItem}
                 refreshing={this.state.loading}
-                onRefresh={() => {
-                    this.setState({ loading: true });
-                    this.refresh();
-                }}
+                onRefresh={this.refresh}
             />)
         }
     }

@@ -9,6 +9,7 @@ import jimmify from '../utils/jimmify';
 import storage from '../utils/store';
 import Modal from 'react-native-modalbox';
 import Login from "./Login";
+import AnswerAQ from './answer/AnswerAQuestion';
 
 const styles = {
     item: {
@@ -18,7 +19,7 @@ const styles = {
         }
     },
     wrapper: {
-        // flex: 1
+        height: '100%'
     },
     modal: {},
     btn: {},
@@ -64,13 +65,14 @@ export default class Answer extends React.Component {
         super(props);
 
         this.login = this.login.bind(this);
+        this.onAnswer = this.onAnswer.bind(this);
 
-        this.state = { loggedIn: false };
+        this.state = { loggedIn: false, selectedQuestion: undefined } ;
 
         storage
             .load({ key: STORE_KEYS.login })
-            .then(() => {
-                this.setState({ loggedIn: true });
+            .then(({ token }) => {
+                this.setState({ loggedIn: true, token });
             }).catch(error => {
                 if (error.name === 'NotFoundError' || error.name === 'ExpiredError') {
                     this.login();
@@ -86,6 +88,26 @@ export default class Answer extends React.Component {
 
     componentDidUpdate() {
         this.login();
+    }
+
+    onAnswer(answer) {
+
+        jimmify.answer({
+            key: this.state.selectedQuestion.key,
+            answer: answer.text,
+            type: answer.originalQuestion.type,
+            links: answer.links,
+            token: this.state.token
+        }).then((response) => {
+            console.log(response);
+            this.answerQueue.refresh();
+        }).catch((err) => {
+            console.warn(err);
+        });
+
+        this.setState({
+            selectedQuestion: undefined
+        });
     }
 
     render() {
@@ -109,13 +131,30 @@ export default class Answer extends React.Component {
                         <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
                     </TouchableOpacity>
                 </View>
-                <Login onLogin={() => {
-                        this.setState({ loggedIn: true });
+                <Login onLogin={(token) => {
+                        this.setState({ loggedIn: true, token });
                         this.loginModal.close();
                     }}
                 />
             </Modal>
-            {this.state.loggedIn ? <AnswerQueue/> : loginText}
+            {this.state.loggedIn ? <AnswerQueue ref={answerQueue => this.answerQueue = answerQueue } onSelectItem={(evt) => { console.log(evt);
+                this.setState({ selectedQuestion: evt.item });
+            }} /> : loginText}
+
+            {this.state.selectedQuestion &&
+            <Modal isOpen={true}
+                   style={styles.modal}
+                   swipeToClose={false}
+                   coverScreen={false}
+                   onClosed={() => { this.setState({ selectedQuestion: undefined})}}
+                   ref={a => this.answerModal = a}>
+                <View style={styles.modalTop}>
+                    <TouchableOpacity onPress={() => { this.answerModal.close() }}>
+                        <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
+                    </TouchableOpacity>
+                </View>
+                <AnswerAQ {...this.state.selectedQuestion} onAnswer={this.onAnswer} />
+            </Modal>}
         </View>);
     }
 }
