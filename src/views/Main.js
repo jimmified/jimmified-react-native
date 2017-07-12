@@ -6,6 +6,7 @@ import { STATUSBAR_HEIGHT } from '../utils/constants';
 import Queue from './Answer';
 import Recent from './Recent';
 import Search from './Search';
+import Settings from './Settings';
 
 const styles = {
     wrapped: {
@@ -28,10 +29,13 @@ export default TabNavigator({
     Answer: { screen: WithTopPadding(Queue) },
     Search: { screen: WithTopPadding(Search) },
     Recent: { screen: WithTopPadding(Recent) },
+    Settings: { screen: WithTopPadding(Settings) }
 }, {
     initialRouteName: 'Search',
     lazy: true,
     tabBarOptions: {
+        showLabel: false,
+        showIcon: true,
         style: {
             marginTop: Platform.OS === 'android' ? STATUSBAR_HEIGHT : 0
         },
