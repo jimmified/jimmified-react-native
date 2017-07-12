@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { Text, FlatList, TouchableOpacity } from 'react-native';
+import { Text, FlatList, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../utils/constants';
 
 const defaultErrorMessage = 'Error fetching results, please check your network connection';
@@ -22,11 +22,6 @@ export default function(requestFunc, Item, options={}) {
     const placeholder = _.isString(options.placeholder) ? <Text style={styles.placeholder}>{options.placeholder}</Text> : options.placeholder;
 
     return class extends React.Component {
-
-        static defaultProps = {
-            onSelectItem: () => {}
-        };
-
         constructor(props) {
             super(props);
 
@@ -62,10 +57,13 @@ export default function(requestFunc, Item, options={}) {
         }
 
         renderItem(props) {
+
+            const Wrapper = this.props.onSelectItem ? TouchableOpacity : View;
+
             return (
-                <TouchableOpacity onPress={_.partial(this.props.onSelectItem, props)}>
+                <Wrapper onPress={_.partial(this.props.onSelectItem || _.noop, props)}>
                     <Item {...props} />
-                </TouchableOpacity>
+                </Wrapper>
             );
         }
 
