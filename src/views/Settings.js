@@ -23,7 +23,8 @@ const SETTINGS = [
         icon: 'ios-log-out-outline',
         enabled: (props, state) => state.loggedIn,
         type: 'button',
-        onSelect: () => {
+        onSelect() {
+            console.log('Setting state');
             storage.remove({ key: STORE_KEYS.login });
             return { loggedIn: false };
         }

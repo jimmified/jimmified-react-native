@@ -7,7 +7,7 @@
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "exp start --tunnel"
+    "start": "exp start --tunnel --dev"
   },
   "dependencies": {
     "@expo/vector-icons": "^5.0.0",

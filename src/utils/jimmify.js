@@ -51,6 +51,13 @@ class Jimmify {
         return this.request({ route: 'answer', method: 'POST', body });
     }
 
+    addPushToken(body) {
+        return this.request({ route: 'expo/add', method: 'POST', body });
+    }
+
+    removePushToken(body) {
+        return this.request({ route: 'expo/del', method: 'POST', body });
+    }
 }
 
 export default new Jimmify();
