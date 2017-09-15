@@ -1,8 +1,6 @@
 import expo from 'expo';
 
-export const JIMMIFY_API_URL = 'https://f3719446.ngrok.io/api/';
-// export const JIMMIFY_API_URL = 'https://jimmified.com/api/';
-
+export const JIMMIFY_API_URL = 'https://jimmified.com/api/';
 export const STATUSBAR_HEIGHT = expo.Constants.statusBarHeight;
 
 export const events = {
@@ -28,5 +26,6 @@ export const colors = {
 };
 
 export const STORE_KEYS = {
-    login: 'loginCreds'
+    login: 'loginCreds',
+    server: 'server'
 };

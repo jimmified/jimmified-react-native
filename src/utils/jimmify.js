@@ -1,11 +1,34 @@
 import urlJoin from 'url-join';
-import { JIMMIFY_API_URL } from './constants'
+import { STORE_KEYS, JIMMIFY_API_URL } from './constants'
+import store from './store';
+
+export function setJimmyUrl(server) {
+  store.save({
+    key: STORE_KEYS.server,
+    data: {
+      server
+    }
+  });
+}
+
+export function getJimmyUrl() {
+
+    return new Promise(resolve => {
+      store.load({ key: STORE_KEYS.server })
+        .then(({ server }) => {
+          resolve(server)
+        }).catch(error => {
+        if (error.name === 'NotFoundError' || error.name === 'ExpiredError') {
+          setJimmyUrl(JIMMIFY_API_URL);
+        }
+        resolve(JIMMIFY_API_URL);
+      });
+    });
+}
 
 class Jimmify {
 
-    constructor(options={}) {
-        this.url = options.url || JIMMIFY_API_URL;
-
+    constructor() {
         // Bind all the things
         this.request = this.request.bind(this);
         this.attemptConnection = this.attemptConnection.bind(this);
@@ -17,10 +40,12 @@ class Jimmify {
     }
 
     request({route, method, body}) {
-        return fetch(urlJoin(this.url, route), {
+        return getJimmyUrl().then((url) => {
+          return fetch(urlJoin(url, route), {
             method,
             body: JSON.stringify(body)
-        }).then((response) => response.json());
+          }).then((response) => response.json());
+        });
     }
 
     attemptConnection() {

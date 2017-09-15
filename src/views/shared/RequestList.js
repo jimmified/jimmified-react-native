@@ -35,7 +35,14 @@ export default function(requestFunc, Item, options={}) {
     }
 
     componentWillMount() {
-      this.notificationSubscription = Notifications.addListener(this.refresh);
+      this.notificationSubscription = Notifications.addListener(() => {
+        this.refresh();
+        Expo.Notifications.setBadgeNumberAsync(0);
+      });
+    }
+
+    componentWillUnmount() {
+      this.notificationSubscription.remove();
     }
 
     refresh() {

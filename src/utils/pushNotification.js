@@ -1,12 +1,24 @@
 import { Permissions, Notifications, Constants } from 'expo';
 import jimmify from './jimmify';
 
+export async function isEnabled() {
+  return new Promise((result) => {
+    Permissions.getAsync(Permissions.NOTIFICATIONS)
+      .then(() => {
+        result(true);
+      })
+      .catch(() => {
+        result(false);
+      });
+  });
+}
+
 async function getToken() {
   const { existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
   let finalStatus = existingStatus;
 
   if (existingStatus !== 'granted') {
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS)
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
     finalStatus = status;
   }
 
