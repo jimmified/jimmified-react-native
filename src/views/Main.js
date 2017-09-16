@@ -73,7 +73,7 @@ const Navigator = TabNavigator({
     Recent: { screen: WithTopPadding(Recent) },
     Settings: { screen: WithTopPadding(Settings) }
 }, {
-    initialRouteName: 'Settings',
+    initialRouteName: 'Search',
     lazy: true,
     tabBarOptions: {
         showLabel: false,

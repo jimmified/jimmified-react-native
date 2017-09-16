@@ -17,7 +17,11 @@
       "assetExts": ["ttf", "mp4", "ttf"]
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adamdierkens.jimmified"
+    },
+    "android": {
+        "package": "com.adamdierkens.jimmified"
     }
   }
 }
