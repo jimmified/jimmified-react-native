@@ -1,4 +1,5 @@
 import React from 'react';
+import { Notifications } from 'expo';
 import { View, Platform } from 'react-native';
 import { TabNavigator } from 'react-navigation';
 import { STATUSBAR_HEIGHT, events } from '../utils/constants';

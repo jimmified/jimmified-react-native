@@ -10,14 +10,18 @@
     "primaryColor": "#cccccc",
     "icon": "./assets/icons/app.png",
     "loading": {
-      "icon": "./assets/icons/loading.png",
-      "hideExponentText": false
+      "icon": "./assets/icons/app.png",
+      "hideExponentText": true
     },
     "packagerOpts": {
       "assetExts": ["ttf", "mp4", "ttf"]
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adamdierkens.jimmified"
+    },
+    "android": {
+        "package": "com.adamdierkens.jimmified"
     }
   }
 }

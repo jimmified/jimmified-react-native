@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import React from 'react';
 import jimmify from '../utils/jimmify';
+import {register} from '../utils/pushNotification';
 import Logo from './shared/RotatingLogos';
 import { View, TextInput, Button, Text } from 'react-native';
-import { colors, STATUSBAR_HEIGHT, STORE_KEYS } from '../utils/constants';
+import { colors, STORE_KEYS } from '../utils/constants';
 import store from '../utils/store';
 
 const styles = {
@@ -58,18 +59,19 @@ export default class Login extends React.Component {
             username: this.state.username,
             password: this.state.password
         }).then((response) => {
-            // TODO: Why isn't this a boolean!?!
             if (response.status === false) {
                 this.setState({
                     invalidLogin: true
                 });
-            // TODO: And why is this a different case!?!
             } else if (response.status === true) {
                 store.save({
                     key: STORE_KEYS.login,
                     data: {
                         token: response.token
                     }
+                });
+                register(response.token).catch((err) => {
+                    console.log('Error sending token')
                 });
                 this.props.onLogin(response.token);
             }

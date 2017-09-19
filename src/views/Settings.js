@@ -1,55 +1,146 @@
 import _ from 'lodash';
 import React from 'react';
-import { STORE_KEYS, colors, STATUSBAR_HEIGHT } from 'utils/constants';
+import * as pushNotifications from '../utils/pushNotification';
+import { STORE_KEYS, colors, STATUSBAR_HEIGHT, JIMMIFY_API_URL } from 'utils/constants';
 import storage from 'utils/store';
 import { Ionicons } from '@expo/vector-icons';
-import { View, FlatList, Text, TouchableOpacity, Platform } from 'react-native';
-import IconButton from 'shared/IconButton'
-import Modal from 'react-native-modalbox';
+import { View, Text, TouchableOpacity, Platform, Switch } from 'react-native';
 import Login from './Login';
+import Prompt from 'react-native-prompt';
+import { setJimmyUrl, getJimmyUrl } from "../utils/jimmify";
 
 const SETTINGS = [
-    {
-        name: 'Log in',
-        icon: 'ios-log-in-outline',
-        type: 'button',
-        enabled: (props, state) => !state.loggedIn,
-        onSelect: (foo) => {
-            foo.loginModal.open();
-        }
-    },
-    {
-        name: 'Log out',
-        icon: 'ios-log-out-outline',
-        enabled: (props, state) => state.loggedIn,
-        type: 'button',
-        onSelect: () => {
-            storage.remove({ key: STORE_KEYS.login });
-            return { loggedIn: false };
+  function title() {
+    return (<View
+        key="title"
+        style={{
+            alignItems: 'center',
+            justifyContent: 'space-around'
+        }}
+    >
+        <Text style={{
+            fontSize: 32
+        }}>Settings</Text>
+    </View>)
+  },
+  function login(state, props, setState) {
+    function callback() {
+        if (state.loggedIn) {
+          storage.remove({ key: STORE_KEYS.login });
+          setState({ loggedIn: false });
+        } else {
+            setState({ showLoginModal: true });
         }
     }
+
+    return (
+      <View
+        key="login"
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginHorizontal: 20,
+          marginVertical: 10
+      }}>
+        <Text style={{
+            fontSize: 24
+        }}>Logged In</Text>
+        <Switch value={state.loggedIn} onValueChange={callback} />
+      </View>
+    )
+  },
+  function enablePushNotifications(state, props, setState) {
+
+    function callback() {
+      if (state.pushNotifications) {
+        if (state.token) {
+          pushNotifications.unregister(state.token);
+          setState({ pushNotifications: false });
+        } else {
+          console.warn("Can't unregister since you're not logged in");
+        }
+      } else {
+        if (state.token) {
+          pushNotifications.register(state.token);
+        } else {
+          console.warn("Can't register since you're not logged in");
+        }
+      }
+    }
+
+    return (
+      <View
+        key="push"
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginHorizontal: 20,
+          marginVertical: 10
+        }}>
+        <Text style={{
+          fontSize: 24
+        }}>Push Notifications</Text>
+        <Switch value={state.pushNotifications} onValueChange={callback} disabled={!state.loggedIn} />
+      </View>
+    )
+  },
+  function devServer(state, props, setState) {
+    if (state.showServerList) {
+      return (<Prompt
+        key="devServer"
+        title="Jimmify Server"
+        defaultValue={state.server}
+        visible={true}
+        onCancel={() => {
+          setState({ showServerList: false });
+        }}
+        onSubmit={(server) => {
+          setState({ showServerList: false, server });
+          setJimmyUrl(server);
+        }}
+      />)
+    }
+
+    return (
+      <View key="devServer">
+        <TouchableOpacity  onPress={() => {
+          setState({ showServerList: true })
+        }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginHorizontal: 20,
+              marginVertical: 10
+            }}
+          >
+              <Text style={{ fontSize: 24 }}>Jimmified Server</Text>
+            <Text style={{ marginLeft: 10 }}>{state.server}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+          onPress={() => {
+            setState({ server: JIMMIFY_API_URL });
+            setJimmyUrl(JIMMIFY_API_URL);
+          }}
+        >
+          <Text style={{ color: colors.RED }}>Reset</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 ];
 
 const styles = {
 
     withMargin: {
         marginHorizontal: 20
-    },
-
-    settingButton: {
-        wrapper: {
-            marginHorizontal: 20,
-            marginVertical: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-            justifyContent: 'space-around'
-        },
-        name: {
-
-        },
-        icon: {
-        }
     },
     modal: {},
     modalTop: {
@@ -68,60 +159,43 @@ export default class Settings extends React.Component {
         }
     };
 
-    _keyExtractor = (item, index) => item.name;
-
     constructor(props) {
         super(props);
 
         this.renderItem = this.renderItem.bind(this);
-        this.state = { loggedIn: false  } ;
+        this.state = {
+          loggedIn: false,
+          showLoginModal: false,
+          pushNotifications: false,
+          server: JIMMIFY_API_URL,
+          showServerList: false
+        };
 
         storage
             .load({ key: STORE_KEYS.login })
-            .then(() => {
-                this.setState({ loggedIn: true });
+            .then(({ token }) => {
+                this.setState({ loggedIn: true, token });
             }).catch(error => {
                 if (error.name === 'NotFoundError' || error.name === 'ExpiredError') {
                     // Do nothing
                     return;
                 }
                 console.warn(error.message);
+            });
+
+        getJimmyUrl().then(server => {
+          this.setState({ server });
         });
+
+        pushNotifications.isEnabled().then(isEnabled => {
+          this.setState({
+            pushNotifications: isEnabled
+          });
+        })
     }
 
-    renderItem({ item }) {
-
-        if (!_.isUndefined(item.enabled)) {
-            if (!Boolean(item.enabled)) {
-                return null;
-            }
-            if (_.isFunction(item.enabled)) {
-                if (!item.enabled(this.props, this.state)) {
-                    return null;
-                }
-            }
-        }
-
-        if (item.type === 'button') {
-            const func = item.onSelect || _.noop;
-
-            const callback = () => {
-                const newState = func(this);
-                if (_.isObject(newState)) {
-                    this.setState(newState);
-                }
-            };
-
-            return (
-                <TouchableOpacity onPress={callback}>
-                    <View style={[styles.settingButton.wrapper]}>
-                        <Text>{item.name}</Text>
-                        <IconButton onPress={_.noop} name={item.icon} size={32}/>
-                    </View>
-                </TouchableOpacity>
-            )
-
-        }
+    renderItem(item) {
+        return item(this.state, this.props, this.setState.bind(this));
     }
 
     componentWillReceiveProps() {
@@ -137,27 +211,33 @@ export default class Settings extends React.Component {
     }
 
     render() {
+        if (this.state.showLoginModal) {
+            return (
+              <View>
+                  <View style={styles.modalTop}>
+                      <TouchableOpacity onPress={() => { this.setState({ showLoginModal: false }) }}>
+                          <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
+                      </TouchableOpacity>
+                  </View>
+                  <Login onLogin={(token) => {
+                    this.setState({ loggedIn: true, showLoginModal: false, token });
+                  }}/>
+              </View>
+            )
+        }
+
+        function spacer(key) {
+          return (<View style={{ height: 0, borderBottomWidth: 2, borderColor: colors.GRAY_LIGHT }} key={key} />);
+        }
+
         return (
-            <View>
-                {!this.state.loggedIn && <Modal ref={login => this.loginModal = login} style={styles.modal} coverScreen={true} swipeToClose={false}>
-                    <View style={styles.modalTop}>
-                        <TouchableOpacity onPress={() => { this.loginModal.close() }}>
-                            <Text style={{ fontSize: 30, color: colors.GRAY_DARK }}>✖</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Login onLogin={(token) => {
-                        this.setState({ loggedIn: true, token });
-                        this.loginModal.close();
-                    }}
-                    />
-                </Modal>}
-                <FlatList
-                    style={{ backgroundColor: colors.GRAY_LIGHT }}
-                    data={SETTINGS}
-                    extraData={this.props}
-                    renderItem={this.renderItem}
-                    keyExtractor={this._keyExtractor}
-                />
+            <View style={{ justifyContent: 'space-between', marginTop: 20 }}>
+              {_.flatten(_.map(SETTINGS, (s, i) => {
+                if (i < 2) {
+                  return this.renderItem(s);
+                }
+                return [spacer(i), this.renderItem(s)];
+              }))}
             </View>
         )
     }
